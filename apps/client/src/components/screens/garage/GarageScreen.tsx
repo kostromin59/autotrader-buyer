@@ -41,7 +41,11 @@ const GarageScreen: FC<IGarageScreenProps> = ({ offers }) => {
     mutationKey: 'offers',
     mutationFn: (dto: IOffer) => TradesService.createTrade(dto),
     onSuccess: () => {
-      setHas(initialItemValue);
+      setHas({
+        ...initialItemValue,
+        item: 4743,
+        quality: 7,
+      });
       setWants(initialItemValue);
       setIsModalOpened(false);
       setEditingId(null);
@@ -53,7 +57,11 @@ const GarageScreen: FC<IGarageScreenProps> = ({ offers }) => {
     mutationKey: ['offers', editingId],
     mutationFn: (dto: IOffer) => TradesService.updateTrade(editingId, dto),
     onSuccess: () => {
-      setHas(initialItemValue);
+      setHas({
+        ...initialItemValue,
+        item: 4743,
+        quality: 7,
+      });
       setWants(initialItemValue);
       setIsModalOpened(false);
       setEditingId(null);
