@@ -498,9 +498,7 @@ class RlBot {
     this.socket.on('joinedLobby', (botId) => {
       if (botId !== this.selectedBot.botId) return;
 
-      this.sendMessage(
-        'Hello! Use commands to trade! Check commands using command /help'
-      );
+      this.sendMessage('Hello! Put your items');
     });
   }
 
