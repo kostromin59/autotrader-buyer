@@ -27,10 +27,12 @@ const initialItemValue: IInitialItemValue = {
 
 const GarageScreen: FC<IGarageScreenProps> = ({ offers }) => {
   const [isModalOpened, setIsModalOpened] = useState(false);
-  const [has, setHas] = useState<IInitialItemValue>(initialItemValue);
+  const [has, setHas] = useState<IInitialItemValue>({
+    ...initialItemValue,
+    item: 4743,
+    quality: 7,
+  });
   const [wants, setWants] = useState<IInitialItemValue>(initialItemValue);
-  const [garageTrade, setGarageTrade] = useState(1);
-  const [garageItem, setGarageItem] = useState(1);
   const [editingId, setEditingId] = useState<number | null>(null);
 
   const queryClient = useQueryClient();
@@ -43,8 +45,6 @@ const GarageScreen: FC<IGarageScreenProps> = ({ offers }) => {
       setWants(initialItemValue);
       setIsModalOpened(false);
       setEditingId(null);
-      setGarageTrade(1);
-      setGarageItem(1);
       queryClient.invalidateQueries('offers');
     },
   });
@@ -57,8 +57,6 @@ const GarageScreen: FC<IGarageScreenProps> = ({ offers }) => {
       setWants(initialItemValue);
       setIsModalOpened(false);
       setEditingId(null);
-      setGarageTrade(1);
-      setGarageItem(1);
       queryClient.invalidateQueries('offers');
     },
   });
@@ -68,8 +66,6 @@ const GarageScreen: FC<IGarageScreenProps> = ({ offers }) => {
     createOfferMutation.mutate({
       has,
       wants,
-      garageItem,
-      garageTrade,
     });
   };
 
@@ -78,8 +74,6 @@ const GarageScreen: FC<IGarageScreenProps> = ({ offers }) => {
     updateOfferMutation.mutate({
       has,
       wants,
-      garageTrade,
-      garageItem,
     });
   };
 
@@ -100,8 +94,6 @@ const GarageScreen: FC<IGarageScreenProps> = ({ offers }) => {
           setWants={setWants}
           setHas={setHas}
           setEditingId={setEditingId}
-          setGarageTrade={setGarageTrade}
-          setGarageItem={setGarageItem}
         />
         <OfferModal
           isLoading={createOfferMutation.isLoading}
@@ -113,17 +105,11 @@ const GarageScreen: FC<IGarageScreenProps> = ({ offers }) => {
             setWants(initialItemValue);
             setEditingId(null);
             setIsModalOpened(false);
-            setGarageItem(1);
-            setGarageTrade(1);
           }}
           isModalOpened={isModalOpened}
           has={has}
           wants={wants}
           isEdit={!!editingId}
-          garageTrade={garageTrade}
-          garageItem={garageItem}
-          setGarageTrade={setGarageTrade}
-          setGarageItem={setGarageItem}
         />
       </Container>
     </section>

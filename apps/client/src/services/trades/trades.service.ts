@@ -15,8 +15,6 @@ interface IOfferItem {
 export interface IOffer {
   has: IOfferItem;
   wants: IOfferItem;
-  garageItem: number;
-  garageTrade: number;
 }
 
 export const TradesService = {
