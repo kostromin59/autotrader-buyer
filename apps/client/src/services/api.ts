@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { AuthHelper } from './auth/auth.helper';
 
-const baseURL = 'https://dev.ngsquad.ru/api/';
+const baseURL = 'http://localhost/api/';
 
 export const api = axios.create({
   baseURL,

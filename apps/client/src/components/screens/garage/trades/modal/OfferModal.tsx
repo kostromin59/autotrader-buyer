@@ -25,10 +25,6 @@ interface IOfferModalProps {
   setWants: Dispatch<SetStateAction<IInitialItemValue>>;
   isLoading: boolean;
   isEdit?: boolean;
-  garageTrade: number;
-  garageItem: number;
-  setGarageTrade: Dispatch<SetStateAction<number>>;
-  setGarageItem: Dispatch<SetStateAction<number>>;
 }
 
 const OfferModal: FC<IOfferModalProps> = ({
@@ -41,10 +37,6 @@ const OfferModal: FC<IOfferModalProps> = ({
   setWants,
   isLoading,
   isEdit,
-  garageItem,
-  garageTrade,
-  setGarageTrade,
-  setGarageItem,
 }) => {
   return (
     <>
@@ -55,103 +47,25 @@ const OfferModal: FC<IOfferModalProps> = ({
       >
         <form
           onSubmit={onSubmit}
-          className="flex flex-col gap-4 items-center w-full min-w-[50rem]"
+          className="flex flex-col gap-4 items-center w-full min-w-[24rem]"
         >
-          <fieldset className="flex gap-8 w-full">
+          <fieldset className="flex flex-col gap-8 justify-center items-center w-full">
             {/* Has item */}
             <fieldset className="flex flex-col gap-2 w-full">
               <Title type="h4" className="text-center">
-                Has item
+                Credits
               </Title>
-              {/* Item */}
-              <Select
-                onChange={(value: number) =>
-                  setHas((prev) => ({
-                    ...prev,
-                    item: value,
-                    quality: getItemInfo(value).quality,
-                    special: getItemInfo(value).special,
-                  }))
-                }
-                placeholder="Select item"
-                options={productsOptions}
-                outValue={productsOptions.find(
-                  (option) => option.value === has.item
-                )}
-              />
-              {/* Quality */}
-              <Select
-                onChange={(value: number | null) =>
-                  setHas((prev) => ({ ...prev, quality: value }))
-                }
-                placeholder="Select quality"
-                options={qualityOptions}
-                showLimit={10}
-                outValue={qualityOptions.find(
-                  (option) => option.value === has.quality
-                )}
-                nullable
-              />
-              {/* Paint */}
-              <Select
-                onChange={(value: number | null) =>
-                  setHas((prev) => ({ ...prev, paint: value }))
-                }
-                placeholder="Select paint"
-                options={paintsOptions}
-                showLimit={15}
-                outValue={paintsOptions.find(
-                  (option) => option.value === has.paint
-                )}
-                nullable
-              />
-              {/* Cert */}
-              <Select
-                onChange={(value: number | null) =>
-                  setHas((prev) => ({ ...prev, cert: value }))
-                }
-                placeholder="Select cert"
-                options={certsOptions}
-                showLimit={16}
-                outValue={certsOptions.find(
-                  (option) => option.value === has.cert
-                )}
-                nullable
-              />
-              {/* Series */}
-              <Select
-                onChange={(value: number | null) =>
-                  setHas((prev) => ({ ...prev, series: value }))
-                }
-                placeholder="Select series"
-                options={seriesOptions}
-                outValue={seriesOptions.find(
-                  (option) => option.value === has.series
-                )}
-                nullable
-              />
               {/* Amount */}
               <Input
                 placeholder="Amount"
                 type={'number'}
                 pattern={'/^d+$/'}
-                min="1"
+                min="10"
                 value={has.amount}
                 onChange={(e) =>
                   setHas((prev) => ({
                     ...prev,
                     amount: Number(e.target.value) || 1,
-                  }))
-                }
-              />
-              <Checkbox
-                id="Has blueprint"
-                label="Blueprint?"
-                checked={has.blueprint}
-                onChange={(e) =>
-                  setHas((prev) => ({
-                    ...prev,
-                    blueprint: e.target.checked,
                   }))
                 }
               />
@@ -252,34 +166,6 @@ const OfferModal: FC<IOfferModalProps> = ({
                     blueprint: e.target.checked,
                   }))
                 }
-              />
-            </fieldset>
-          </fieldset>
-          <fieldset className="flex gap-3 w-full">
-            <fieldset className="w-full">
-              <Title className="text-center" type="h3">
-                Trade
-              </Title>
-              <Input
-                placeholder="Garage trade"
-                type={'number'}
-                pattern={'/^d+$/'}
-                min="1"
-                value={garageTrade}
-                onChange={(e) => setGarageTrade(Number(e.target.value))}
-              />
-            </fieldset>
-            <fieldset className="w-full">
-              <Title className="text-center" type="h3">
-                Item
-              </Title>
-              <Input
-                placeholder="Garage item"
-                type={'number'}
-                pattern={'/^d+$/'}
-                min="1"
-                value={garageItem}
-                onChange={(e) => setGarageItem(Number(e.target.value))}
               />
             </fieldset>
           </fieldset>

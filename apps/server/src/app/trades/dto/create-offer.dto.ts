@@ -1,5 +1,5 @@
 import { ITradeItem } from '@autotrader/interfaces';
-import { IsNotEmptyObject, IsNumber } from 'class-validator';
+import { IsNotEmptyObject } from 'class-validator';
 
 export class CreateOfferDto {
   @IsNotEmptyObject()
@@ -7,10 +7,4 @@ export class CreateOfferDto {
 
   @IsNotEmptyObject()
   wants: ITradeItem;
-
-  @IsNumber()
-  garageTrade: number;
-
-  @IsNumber()
-  garageItem: number;
 }

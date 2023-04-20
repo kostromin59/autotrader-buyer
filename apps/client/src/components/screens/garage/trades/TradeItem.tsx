@@ -19,8 +19,6 @@ interface ITradeItemProps {
   setHas: Dispatch<SetStateAction<IInitialItemValue>>;
   setWants: Dispatch<SetStateAction<IInitialItemValue>>;
   setEditingId: Dispatch<SetStateAction<number | null>>;
-  setGarageItem: Dispatch<SetStateAction<number>>;
-  setGarageTrade: Dispatch<SetStateAction<number>>;
 }
 
 const TradeItem: FC<ITradeItemProps> = ({
@@ -29,8 +27,6 @@ const TradeItem: FC<ITradeItemProps> = ({
   setWants,
   setHas,
   openModal,
-  setGarageTrade,
-  setGarageItem,
 }) => {
   const queryClient = useQueryClient();
 
@@ -66,9 +62,6 @@ const TradeItem: FC<ITradeItemProps> = ({
         </div>
         <div>
           <Text className="font-bold text-center">FOR</Text>
-          <Text className="font-bold text-center">
-            {offer.garageTrade}-{offer.garageItem}
-          </Text>
         </div>
         <div>
           <ItemCard
@@ -100,8 +93,6 @@ const TradeItem: FC<ITradeItemProps> = ({
             setWants(offer.wants);
             openModal();
             setEditingId(offer.id);
-            setGarageItem(offer.garageItem);
-            setGarageTrade(offer.garageTrade);
           }}
         >
           <AiFillEdit className="text-2xl" />

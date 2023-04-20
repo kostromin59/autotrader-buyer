@@ -9,8 +9,6 @@ interface ITradesListProps {
   setHas: Dispatch<SetStateAction<IInitialItemValue>>;
   setWants: Dispatch<SetStateAction<IInitialItemValue>>;
   setEditingId: Dispatch<SetStateAction<number | null>>;
-  setGarageItem: Dispatch<SetStateAction<number>>;
-  setGarageTrade: Dispatch<SetStateAction<number>>;
 }
 
 const TradesList: FC<ITradesListProps> = ({
@@ -19,8 +17,6 @@ const TradesList: FC<ITradesListProps> = ({
   openModal,
   setWants,
   setHas,
-  setGarageItem,
-  setGarageTrade,
 }) => {
   return (
     <ul className="flex flex-wrap gap-3 py-3">
@@ -33,8 +29,6 @@ const TradesList: FC<ITradesListProps> = ({
             setHas={setHas}
             setWants={setWants}
             openModal={openModal}
-            setGarageItem={setGarageItem}
-            setGarageTrade={setGarageTrade}
           />
         ))}
     </ul>

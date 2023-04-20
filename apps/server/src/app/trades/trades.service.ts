@@ -32,8 +32,6 @@ export class TradesService {
         userId,
         has,
         wants,
-        garageItem: dto.garageItem,
-        garageTrade: dto.garageTrade,
       },
       // Including has and wants items
       {
@@ -160,11 +158,6 @@ export class TradesService {
       quality: Number(dto.wants.quality),
       series: Number(dto.wants.series),
       special: Number(dto.wants.special),
-    });
-
-    await offer.update({
-      garageTrade: dto.garageTrade,
-      garageItem: dto.garageItem,
     });
 
     return offer;

@@ -31,12 +31,6 @@ export class TradeOffer
   @Column
   isEnabled: boolean;
 
-  @Column
-  garageTrade: number;
-
-  @Column
-  garageItem: number;
-
   @HasOne(() => TradeItem, {
     as: 'has',
     foreignKey: 'hasId',
