@@ -2,7 +2,11 @@
   "name": "autotrader",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "build": "npx nx build server --prod --skip-nx-cache && npx nx build accepter --prod --skip-nx-cache",
+    "start": "docker compose up -d",
+    "start:site": "npx nx serve client"
+  },
   "private": true,
   "dependencies": {
     "@nestjs/common": "^9.0.0",
