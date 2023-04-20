@@ -49,13 +49,9 @@ class RlBot {
   private accepter: Socket;
   private selectedBot: Bot;
   private queue: string[] = [];
-  private cart: number[] = [];
-  private isDeletingItems = false;
-  private isRemoveCommand = false;
-  private isWantCommand = false;
-  private isCartCommand = false;
-  private isTradeCommand = false;
+  private isAssetUpdated = false;
   private isUserControl = false;
+  private timeout: ReturnType<typeof setTimeout> = null;
   inventory: { assets: Asset[]; credits: number } = {
     credits: 0,
     assets: [],
@@ -372,7 +368,7 @@ class RlBot {
   async confirmTrade() {
     const state = await this.getTradeState();
 
-    if (this.isDeletingItems) return;
+    if (this.isAssetUpdated && !this.isUserControl) return;
 
     return new Promise((resolve, reject) => {
       if (!this.socket) return reject(false);
@@ -403,395 +399,12 @@ class RlBot {
   private onMessage() {
     if (!this.socket) return;
 
-    // const wantCommand = async (argument: string) => {
-    //   if (!argument) return this.sendMessage('Invalid argument');
-    //   this.isWantCommand = true;
-    //
-    //   const [numberOfTrade, numberOfItem] = argument
-    //     .trim()
-    //     .split('-')
-    //     .map((num) => Number(num));
-    //
-    //   // Invalid argument
-    //   if (
-    //     !numberOfTrade ||
-    //     !numberOfItem ||
-    //     isNaN(numberOfTrade) ||
-    //     isNaN(numberOfItem) ||
-    //     numberOfItem > 10 ||
-    //     numberOfItem < 1
-    //   ) {
-    //     this.isWantCommand = false;
-    //     return this.sendMessage('Invalid argument');
-    //   }
-    //   // Find offer
-    //   const tradeOffer = this.trades.find(
-    //     (offer) =>
-    //       offer.garageItem === numberOfItem &&
-    //       offer.garageTrade === numberOfTrade
-    //   );
-    //
-    //   if (!tradeOffer) {
-    //     this.isWantCommand = false;
-    //     return this.sendMessage('Invalid argument');
-    //   }
-    //
-    //   // Is disabled
-    //   if (!tradeOffer.isEnabled) {
-    //     this.isWantCommand = false;
-    //     return this.sendMessage("I can't do it right now");
-    //   }
-    //
-    //   let giveCredits = 0;
-    //   const ignoreGiveItems: number[] = [];
-    //
-    //   const inventory = await this.getInventory();
-    //
-    //   // Check give items
-    //
-    //   if (tradeOffer.has.item === 4743) {
-    //     // CREDITS LOGIC
-    //     giveCredits += tradeOffer.has.amount;
-    //   } else {
-    //     // ITEMS LOGIC
-    //     const suitableItems: number[] = [];
-    //     const inventorySuitableItems = inventory.assets.filter(
-    //       (inventoryItem) =>
-    //         !ignoreGiveItems.includes(inventoryItem.id) &&
-    //         inventoryItem.item === tradeOffer.has.item &&
-    //         inventoryItem.paint === tradeOffer.has.paint &&
-    //         (inventoryItem.cert === tradeOffer.has.cert ||
-    //           !tradeOffer.has.cert) &&
-    //         (inventoryItem.series === tradeOffer.has.series ||
-    //           !tradeOffer.has.series) &&
-    //         getItemInfo(inventoryItem.item).special ===
-    //         tradeOffer.has.special &&
-    //         inventoryItem.quality === tradeOffer.has.quality &&
-    //         Boolean(inventoryItem.blueprint) === tradeOffer.has.blueprint
-    //     );
-    //
-    //     // Items not enough in inventory
-    //     if (inventorySuitableItems.length < tradeOffer.has.amount) {
-    //       this.isWantCommand = false;
-    //       return this.sendMessage("I don't have enough items");
-    //     }
-    //
-    //     // The same offers in cart
-    //     const offersInCart = this.cart.filter(
-    //       (cartId) => cartId === tradeOffer.id
-    //     );
-    //
-    //     // If inventory items less than ask
-    //     if (
-    //       inventorySuitableItems.length <
-    //       tradeOffer.has.amount * (offersInCart.length + 1)
-    //     ) {
-    //       this.isWantCommand = false;
-    //       return this.sendMessage("I don't have enough items");
-    //     }
-    //
-    //     // Ignore some items
-    //     for (let j = 0; j < tradeOffer.has.amount; j++) {
-    //       // If found all suitable items
-    //       if (suitableItems.length === tradeOffer.has.amount) break;
-    //
-    //       const currentSuitableItem = inventorySuitableItems[j];
-    //       if (ignoreGiveItems.includes(currentSuitableItem.id)) continue;
-    //
-    //       ignoreGiveItems.push(currentSuitableItem.id);
-    //       suitableItems.push(currentSuitableItem.id);
-    //     }
-    //
-    //     // Calculate give and get items
-    //     const [give, get] = this.cart.reduce(
-    //       (numOfItems, tradeIdInCart) => {
-    //         const currentTradeOffer = this.trades.find(
-    //           (offer) => offer.id === tradeIdInCart
-    //         );
-    //
-    //         if (currentTradeOffer.has.item !== 4743) {
-    //           numOfItems[0] = numOfItems[0] + currentTradeOffer.has.amount;
-    //         }
-    //
-    //         if (currentTradeOffer.wants.item !== 4743) {
-    //           numOfItems[1] = numOfItems[1] + currentTradeOffer.wants.amount;
-    //         }
-    //
-    //         return numOfItems;
-    //       },
-    //       [0, 0]
-    //     );
-    //
-    //     if (give > 24 || get > 24) {
-    //       this.isWantCommand = false;
-    //       return this.sendMessage('Too much items');
-    //     } else if (
-    //       tradeOffer.has.item !== 4743 &&
-    //       give + tradeOffer.has.amount > 24
-    //     ) {
-    //       this.isWantCommand = false;
-    //       return this.sendMessage('Too much items');
-    //     } else if (
-    //       tradeOffer.wants.item !== 4743 &&
-    //       get + tradeOffer.wants.amount > 24
-    //     ) {
-    //       this.isWantCommand = false;
-    //       return this.sendMessage('Too much items');
-    //     }
-    //   }
-    //
-    //   // Not enough credits
-    //   if (inventory.credits < giveCredits) {
-    //     this.isWantCommand = false;
-    //     return this.sendMessage("I don't have enough credits");
-    //   }
-    //
-    //   this.cart.push(tradeOffer.id);
-    //
-    //   this.isWantCommand = false;
-    //   return this.sendMessage(
-    //     'Trade added to your cart. Put items or credits and type /trade'
-    //   );
-    // };
-    //
-    // const tradeCommand = async (state: Trade) => {
-    //   let credits = 0;
-    //   const ignoreItems: number[] = [];
-    //   this.isTradeCommand = true;
-    //
-    //   // Check get items
-    //   for (let i = 0; i < this.cart.length; i++) {
-    //     const currentTradeId = this.cart[i];
-    //     const currentTrade = this.trades.find(
-    //       (offer) => offer.id === currentTradeId
-    //     );
-    //
-    //     if (currentTrade.wants.item === 4743) {
-    //       // CREDITS LOGIC
-    //       credits += currentTrade.wants.amount;
-    //     } else {
-    //       // ITEMS LOGIC
-    //       const suitableItems: number[] = [];
-    //
-    //       for (let j = 0; j < state.assets.get.length; j++) {
-    //         // If found all suitable items
-    //         if (suitableItems.length === currentTrade.wants.amount) break;
-    //
-    //         const currentItem = state.assets.get[j];
-    //
-    //         // If item is validated
-    //         if (ignoreItems.includes(currentItem.id)) {
-    //           continue;
-    //         }
-    //
-    //         // If item suit
-    //         if (
-    //           currentItem.item === currentTrade.wants.item &&
-    //           currentItem.paint === currentTrade.wants.paint &&
-    //           (currentItem.cert === currentTrade.wants.cert ||
-    //             !currentTrade.wants.cert) &&
-    //           (currentItem.series === currentTrade.wants.series ||
-    //             !currentTrade.wants.series) &&
-    //           getItemInfo(currentItem.item).special ===
-    //           currentTrade.wants.special &&
-    //           currentItem.quality === currentTrade.wants.quality &&
-    //           Boolean(currentItem.blueprint) === currentTrade.wants.blueprint
-    //         ) {
-    //           suitableItems.push(currentItem.id);
-    //           ignoreItems.push(currentItem.id);
-    //         }
-    //       }
-    //
-    //       // If not enough items
-    //       if (suitableItems.length !== currentTrade.wants.amount) {
-    //         this.isTradeCommand = false;
-    //         return this.sendMessage('You have to put items first');
-    //       }
-    //     }
-    //   }
-    //
-    //   // If not enough credits
-    //   if (state.credits.get < credits) {
-    //     this.isTradeCommand = false;
-    //     return this.sendMessage('Not enough credits');
-    //   }
-    //
-    //   this.sendMessage(`In your cart ${this.cart.length} offers`);
-    //
-    //   const inventory = await this.getInventory();
-    //   const ignoreInventoryItems: number[] = [];
-    //   let creditsPut = 0;
-    //
-    //   // Put items
-    //   for (let i = 0; i < this.cart.length; i++) {
-    //     const currentTradeId = this.cart[i];
-    //     const currentTrade = this.trades.find(
-    //       (offer) => offer.id === currentTradeId
-    //     );
-    //
-    //     if (currentTrade.has.item === 4743) {
-    //       // CREDITS
-    //       creditsPut += currentTrade.has.amount;
-    //     } else {
-    //       // ITEMS
-    //       const inventorySuitableItems = inventory.assets.filter(
-    //         (inventoryItem) =>
-    //           !ignoreInventoryItems.includes(inventoryItem.id) &&
-    //           inventoryItem.item === currentTrade.has.item &&
-    //           inventoryItem.paint === currentTrade.has.paint &&
-    //           (inventoryItem.cert === currentTrade.has.cert ||
-    //             !currentTrade.has.cert) &&
-    //           (inventoryItem.series === currentTrade.has.series ||
-    //             !currentTrade.has.series) &&
-    //           getItemInfo(inventoryItem.item).special ===
-    //           currentTrade.has.special &&
-    //           inventoryItem.quality === currentTrade.has.quality &&
-    //           Boolean(inventoryItem.blueprint) === currentTrade.has.blueprint
-    //       );
-    //
-    //       const puttedItems: number[] = [];
-    //       // FIND ITEM
-    //       for (let j = 0; j < inventorySuitableItems.length; j++) {
-    //         if (currentTrade.has.amount === puttedItems.length) break;
-    //
-    //         const currentInventoryItem = inventorySuitableItems[j];
-    //
-    //         if (ignoreInventoryItems.includes(currentInventoryItem.id))
-    //           continue;
-    //
-    //         ignoreInventoryItems.push(currentInventoryItem.id);
-    //         puttedItems.push(currentInventoryItem.id);
-    //
-    //         if (this.isDeletingItems) {
-    //           this.clearTrade();
-    //           break;
-    //         }
-    //
-    //         await this.updateAsset(currentInventoryItem.id, true);
-    //       }
-    //     }
-    //   }
-    //
-    //   if (this.isDeletingItems) {
-    //     this.clearTrade();
-    //     this.isTradeCommand = false;
-    //     return;
-    //   }
-    //   // PUT CREDITS AND CONFIRM TRADE
-    //   await this.updateCredits(creditsPut);
-    //   await this.confirmTrade();
-    //   this.isTradeCommand = false;
-    // };
-    //
-    // const cartCommand = () => {
-    //   this.isCartCommand = true;
-    //   const cart = this.cart
-    //     .map((cartId) => {
-    //       const trade = this.trades.find((trade) => trade.id === cartId);
-    //       return `${trade.garageTrade}-${trade.garageItem}`;
-    //     })
-    //     .join('; ');
-    //
-    //   this.sendMessage(cart);
-    //   this.isCartCommand = false;
-    // };
-    //
-    // const removeCommand = (argument: string) => {
-    //   if (!argument) return this.sendMessage('Invalid argument');
-    //
-    //   this.isRemoveCommand = true;
-    //
-    //   const [numberOfTrade, numberOfItem] = argument
-    //     .trim()
-    //     .split('-')
-    //     .map((num) => Number(num));
-    //
-    //   // Invalid argument
-    //   if (
-    //     !numberOfTrade ||
-    //     !numberOfItem ||
-    //     isNaN(numberOfTrade) ||
-    //     isNaN(numberOfItem) ||
-    //     numberOfItem > 10 ||
-    //     numberOfItem < 1
-    //   ) {
-    //     this.isRemoveCommand = false;
-    //     return this.sendMessage('Invalid argument');
-    //   }
-    //   // Current trade offer
-    //   const tradeOffer = this.trades.find(
-    //     (trade) =>
-    //       trade.garageTrade === numberOfTrade &&
-    //       trade.garageItem === numberOfItem
-    //   );
-    //
-    //   if (!tradeOffer) {
-    //     this.isRemoveCommand = false;
-    //     return this.sendMessage('Invalid argument');
-    //   }
-    //   // Clear cart
-    //   const index = this.cart.indexOf(tradeOffer.id);
-    //
-    //   if (index > -1) {
-    //     runInAction(() => {
-    //       this.cart.splice(index, 1);
-    //     });
-    //   }
-    //
-    //   this.isRemoveCommand = false;
-    //   this.sendMessage('Done');
-    // };
-    //
     const onMessageEvent = async (botId: string, message: string) => {
       if (botId !== this.selectedBot.botId) return;
 
       runInAction(() => {
         this.chat.push(`${this.lobbyOpponentNickname}: ${message}`);
       });
-      //
-      // // AUTO
-      // if (this.isUserControl) return;
-      // // If not command
-      // if (message[0] !== '/') return;
-      //
-      // const [command, argument] = message
-      //   .substring(1)
-      //   .trim()
-      //   .toLowerCase()
-      //   .split(' ');
-      //
-      // if (command === 'help') {
-      //   await this.sendMessage(
-      //     'TradeId is in the description, itemId is the square in trade offer (from 1 to 10)'
-      //   );
-      //   await this.sendMessage('1) /want tradeId-itemId (Example: /want 5-9)');
-      //   await this.sendMessage(
-      //     '2) /trade (I will put items from cart (use /want) and confirm trade)'
-      //   );
-      //   await this.sendMessage('3) /cart (You will see your cart)');
-      //   await this.sendMessage(
-      //     '4) /remove tradeId-itemId (I will remove offer from the cart)'
-      //   );
-      //   await this.sendMessage('You can ask help Kostromin#3600 in discord');
-      //   return;
-      // }
-      //
-      // await this.clearTrade();
-      // const state = await this.getTradeState();
-      //
-      // if (
-      //   this.isDeletingItems ||
-      //   this.isCartCommand ||
-      //   this.isWantCommand ||
-      //   this.isTradeCommand ||
-      //   this.isRemoveCommand
-      // )
-      //   return this.sendMessage('Repeat command');
-      //
-      // if (command === 'want') wantCommand(argument);
-      // else if (command === 'trade') tradeCommand(state);
-      // else if (command === 'cart') cartCommand();
-      // else if (command === 'remove') removeCommand(argument);
     };
 
     this.socket.off('chatMessage', onMessageEvent);
@@ -823,21 +436,19 @@ class RlBot {
       });
 
       TelegramService.sendMessage(
-        `https://autotrader.ngsquad.ru/completed-trades/${completedTrade.id}`
+        `http://localhost/completed-trades/${completedTrade.id}`
       );
 
       runInAction(() => {
         this.status = BotStatus.IN_LOBBY;
         this.tradeState = initialTradeState;
-        this.cart = [];
-        this.isCartCommand = false;
-        this.isWantCommand = false;
-        this.isTradeCommand = false;
-        this.isDeletingItems = false;
-        this.isRemoveCommand = false;
+        this.isAssetUpdated = false;
       });
 
-      this.destroyLobby();
+      // Leave in 1s
+      setTimeout(() => {
+        this.destroyLobby();
+      }, 1000);
     });
   }
 
@@ -849,13 +460,13 @@ class RlBot {
       runInAction(() => {
         this.status = BotStatus.IN_LOBBY;
         this.tradeState = initialTradeState;
-        this.cart = [];
-        this.isCartCommand = false;
-        this.isWantCommand = false;
-        this.isTradeCommand = false;
-        this.isDeletingItems = false;
-        this.isRemoveCommand = false;
+        this.isAssetUpdated = false;
       });
+
+      // Leave in 1s
+      setTimeout(() => {
+        this.destroyLobby();
+      }, 1000);
     });
   }
 
@@ -872,13 +483,8 @@ class RlBot {
         this.tradeState = initialTradeState;
         this.lobbyOpponentNickname = 'Nobody';
         this.chat = [];
-        this.cart = [];
+        this.isAssetUpdated = false;
         this.isUserControl = false;
-        this.isCartCommand = false;
-        this.isWantCommand = false;
-        this.isTradeCommand = false;
-        this.isDeletingItems = false;
-        this.isRemoveCommand = false;
       });
 
       if (this.queue.length > 0) {
@@ -900,10 +506,11 @@ class RlBot {
 
   private onAssetUpdate() {
     if (!this.socket) return;
-    let timeout: ReturnType<typeof setTimeout> = null;
+
     this.socket.on('tradeAssetUpdate', (botId) => {
       if (botId !== this.selectedBot.botId) return;
-      clearTimeout(timeout);
+      this.isAssetUpdated = true;
+      clearTimeout(this.timeout);
 
       runInAction(() => {
         this.status = BotStatus.IN_TRADE;
@@ -913,10 +520,64 @@ class RlBot {
 
       // AUTO
       if (this.isUserControl) return;
+
+      this.clearTrade();
+
       // this.clearTrade();
-      timeout = setTimeout(() => {
-        return this.sendMessage('ok!');
-      }, 1500);
+      this.timeout = setTimeout(async () => {
+        this.isAssetUpdated = false;
+        let credits = 0;
+        const skipItems: number[] = [];
+        const state = await this.getTradeState();
+
+        for (let i = 0; i < state.assets.get.length; i++) {
+          const currentGetItem = state.assets.get[i];
+          const offer = this.trades.find(
+            (currentOffer) =>
+              currentOffer.isEnabled &&
+              matchItems(currentGetItem, currentOffer.wants)
+          );
+
+          // Skip if no offer
+          if (!offer) continue;
+
+          // If need only 1 item
+          if (offer.wants.amount === 1) {
+            credits += offer.has.amount;
+            skipItems.push(currentGetItem.id);
+            continue;
+          }
+
+          // If need more then 1 item
+          const suitableItems = state.assets.get.filter(
+            (item) =>
+              matchItems(item, offer.wants) && !skipItems.includes(item.id)
+          );
+
+          // If not enough items
+          if (suitableItems.length < offer.wants.amount) continue;
+
+          // Add items to skip
+          for (let j = 0; j < offer.wants.amount; j++) {
+            const currentSuitableItem = suitableItems[j];
+            skipItems.push(currentSuitableItem.id);
+          }
+
+          // Calculate credits
+          credits += offer.has.amount;
+        }
+
+        if (this.isUserControl || this.isAssetUpdated) return;
+
+        const inventory = await this.getInventory();
+
+        if (credits > inventory.credits)
+          return this.sendMessage("I don't have enough credits!");
+
+        await this.updateCredits(credits);
+        await this.confirmTrade();
+        return;
+      }, 2000);
     });
   }
 
@@ -938,20 +599,9 @@ class RlBot {
   }
 
   private async clearTrade() {
-    this.isDeletingItems = true;
     await this.updateCredits(0);
-    const state = await this.getTradeState();
-
-    for (let i = 0; i < state.assets.give.length; i++) {
-      const item = state.assets.give[i];
-
-      await this.updateAsset(item.id, false);
-    }
-
     await this.getTradeState();
 
-    this.isDeletingItems = false;
-    this.isTradeCommand = false;
     return true;
   }
 }
