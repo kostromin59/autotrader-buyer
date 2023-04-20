@@ -1,0 +1,36 @@
+version: '3'
+services:
+  client:
+    image: autotrader-client
+    restart: always
+    environment:
+      - PORT=3000
+    ports:
+      - 3000:3000
+    networks:
+      - 'atnetwork'
+  server:
+    image: autotrader-server
+    restart: always
+    env_file:
+      - ./.env
+    ports:
+      - 5000:5000
+    networks:
+      - 'atnetwork'
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_password
+    # ports:
+    #   - 5432:5432
+    expose:
+      - 5432
+    # volumes:
+    #   - ./database:/var/lib/postgresql/data
+    networks: ['atnetwork']
+networks:
+  atnetwork: {}

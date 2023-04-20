@@ -1,0 +1,6 @@
+FROM node:18.15.0-alpine
+WORKDIR /app
+COPY ./dist/apps/server .
+COPY package*.json ./
+RUN npm install --production
+CMD ["node", "main.js"]

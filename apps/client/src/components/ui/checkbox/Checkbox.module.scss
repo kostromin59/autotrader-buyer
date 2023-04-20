@@ -1,0 +1,16 @@
+.label {
+  @apply flex items-center;
+  &::before {
+    @apply w-6 h-6 border-black border-2 mr-1 rounded-md;
+    content: '';
+  }
+}
+
+.checkbox {
+  &:checked + label::before {
+    @apply bg-black;
+    background-image: url('/check.svg');
+    background-position: center;
+    background-size: contain;
+  }
+}
