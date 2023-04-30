@@ -17,5 +17,6 @@ TELEGRAM_TOKEN=Токен_от_телеграм_бота
 ADMIN_KEY=Ключ_от_апи
 ADMIN_EMAIL=Почта_админ
 ```
-5) Ввести команду `npm run start`
-6) Ввести команду `npm run start:site`
+5) Изменить ip в папке `conf.d`
+6) Ввести команду `npm run start`
+7) Ввести команду `npm run start:site`
