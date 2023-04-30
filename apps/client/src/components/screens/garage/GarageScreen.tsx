@@ -109,7 +109,11 @@ const GarageScreen: FC<IGarageScreenProps> = ({ offers }) => {
           setHas={setHas}
           onSubmit={editingId ? onSubmitUpdate : onSubmitCreate}
           onClose={() => {
-            setHas(initialItemValue);
+            setHas({
+              ...initialItemValue,
+              item: 4743,
+              quality: 7,
+            });
             setWants(initialItemValue);
             setEditingId(null);
             setIsModalOpened(false);
