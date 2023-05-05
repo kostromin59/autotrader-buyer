@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { AuthHelper } from './auth/auth.helper';
 
-const baseURL = 'http://localhost/api/';
+const baseURL = 'https://1478045-ct29698.tw1.ru/api/';
 
 export const api = axios.create({
   baseURL,

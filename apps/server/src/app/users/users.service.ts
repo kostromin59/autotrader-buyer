@@ -20,25 +20,25 @@ export class UsersService {
     private readonly configService: ConfigService
   ) {
     // Test account
-    this.userEntity
-      .findOne({
-        where: {
-          email: 'kostromin@ngsquad.ru',
-        },
-      })
-      .then((user) => {
-        if (!user) {
-          this.createUser({
-            email: configService.get('ADMIN_EMAIL'),
-            key: configService.get('ADMIN_KEY'),
-            telegram: configService.get('ADMIN_TELEGRAM'),
-          }).then((user) =>
-            user.update({
-              role: UserRole.ADMIN,
-            })
-          );
-        }
-      });
+    // this.userEntity
+    //   .findOne({
+    //     where: {
+    //       email: 'weker1230@gmail.com',
+    //     },
+    //   })
+    //   .then((user) => {
+    //     if (!user) {
+    //       this.createUser({
+    //         email: configService.get('ADMIN_EMAIL'),
+    //         key: configService.get('ADMIN_KEY'),
+    //         telegram: configService.get('ADMIN_TELEGRAM'),
+    //       }).then((user) =>
+    //         user.update({
+    //           role: UserRole.ADMIN,
+    //         })
+    //       );
+    //     }
+    //   });
   }
 
   // Create user
