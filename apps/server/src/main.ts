@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import express from 'express';
 
 async function bootstrap() {
   // Application
@@ -16,6 +17,18 @@ async function bootstrap() {
 
   // Cookies
   app.use(cookieParser());
+
+  app.use(
+    express.json({
+      limit: '1000mb',
+    })
+  );
+
+  app.use(
+    express.urlencoded({
+      limit: '1000mb',
+    })
+  );
 
   // Global preifx
   const globalPrefix = process.env.GLOBAL_PREFIX || '';
